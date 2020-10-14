@@ -8,6 +8,7 @@ import time
 import os
 
 from sklearn.metrics import precision_recall_fscore_support as score
+from sklearn.metrics import mean_squared_error, r2_score
 
 def bootstrapping(train_df, n_bootstrap):
     bootstrap_indices = np.random.randint(low=0, high=len(train_df), size=n_bootstrap)
@@ -23,12 +24,10 @@ def random_forest_algorithm(train_df, n_trees, n_bootstrap, n_features, tree_max
         tree = decision_tree_algorithm(df_bootstrapped, ml_task, max_depth=tree_max_depth, random_subspace=n_features)
         
         #prune the tree
-        df_prune_train, df_prune_val = train_test_split(train_df, test_size=0.15)
-        pruned_tree = post_pruning(tree, df_prune_train, df_prune_val, ml_task="classification")
-        forest.append(pruned_tree)
+        #df_prune_train, df_prune_val = train_test_split(train_df, test_size=0.15)
+        #pruned_tree = post_pruning(tree, df_prune_train, df_prune_val, ml_task="classification")
+        forest.append(tree)
         
-        forest.append(pruned_tree)
-
     return forest
     
     
@@ -70,16 +69,22 @@ def random_forest_predict(test_df, forest):
     return random_forest_predictions
     
 
-def calculate_forest_accuracy(df, forest):
+def calculate_forest_accuracy(df, forest, ml_task):
     predictions = random_forest_predict(df, forest)
-    predictions_correct = predictions == df.label
+    predictions_correct = predictions == df.target_label
     accuracy = predictions_correct.mean()    
-    
-    precision, recall, fscore, support = score(df['label'], predictions, average='weighted')
 
-    print('precision: \t {}'.format(precision))
-    print('recall: \t {}'.format(recall))
-    print('fscore: \t {}'.format(fscore))
-    print('support:\t {}'.format(support))
-    
+    if(ml_task == 'classification'):
+        precision, recall, fscore, support = score(df['target_label'], predictions, average='weighted')
+        print('precision: \t {}'.format(precision))
+        print('recall: \t {}'.format(recall))
+        print('fscore: \t {}'.format(fscore))
+        print('support:\t {}'.format(support))
+    # Regression Task
+    else:
+        r2 = r2_score(df['target_label'], predictions)
+        mse = mean_squared_error(df['target_label'], predictions)
+        print('R2 Score: \t {}'.format(r2))
+        print('Mean Squared Error: \t {}'.format(mse))
+        
     return accuracy, predictions

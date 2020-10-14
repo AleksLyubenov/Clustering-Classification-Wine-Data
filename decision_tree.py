@@ -102,7 +102,6 @@ def determine_best_split(data, potential_splits, ml_task):
 
 def split_data(data, split_column, split_value):
     split_column_values = data[:, split_column]
-
     type_of_feature = FEATURE_TYPES[split_column]
     if type_of_feature == "continuous":
         data_below = data[split_column_values <= split_value]
@@ -121,7 +120,7 @@ def determine_type_of_feature(df):
     n_unique_values_treshold = 15
     
     for feature in df.columns:
-        if feature != "label":
+        if feature != "target_label":
             unique_values = df[feature].unique()
             example_value = unique_values[0]
             if (isinstance(example_value, str)) or (len(unique_values) <= n_unique_values_treshold):
@@ -191,7 +190,6 @@ def decision_tree_algorithm(df, ml_task, counter=0, min_samples=2, max_depth=5, 
 
 
 def predict_example(example, tree):
-    
     # tree is just a root node
     if not isinstance(tree, dict):
         return tree
@@ -236,7 +234,7 @@ def make_predictions(df, tree):
 
 def calculate_accuracy(df, tree):
     predictions = make_predictions(df, tree)
-    predictions_correct = predictions == df.label
+    predictions_correct = predictions == df.target_label
     accuracy = predictions_correct.mean()
     
     return accuracy

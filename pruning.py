@@ -18,16 +18,16 @@ def filter_df(df, question):
 	
 def determine_leaf(df_train, ml_task):
     if ml_task == "regression":
-        return df_train.label.mean()
+        return df_train.target_label.mean()
     
     # classification
     else:
-        return df_train.label.value_counts().index[0]
+        return df_train.target_label.value_counts().index[0]
         
         
 def determine_errors(df_val, tree, ml_task):
     predictions = make_predictions(df_val, tree)
-    actual_values = df_val.label
+    actual_values = df_val.target_label
     
     if ml_task == "regression":
         # mean squared error
