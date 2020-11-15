@@ -79,6 +79,23 @@ class UI_MainWindow(object):
         # connect RecommendationPushButton to function on_click_recommendation
         self.RecommendationPushButton.clicked.connect(self.on_click_recommendation)
         
+        self.RecommendationComboBox = QtWidgets.QComboBox(self.centralwidget)
+        self.RecommendationComboBox.setGeometry(QtCore.QRect(280, 330, 120, 20))
+        self.RecommendationComboBox.setObjectName("ClassificationComboBox")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        self.RecommendationComboBox.addItem("")
+        
+        self.RecommendationLabel = QtWidgets.QLabel(self.centralwidget)
+        self.RecommendationLabel.setGeometry(QtCore.QRect(80, 330, 180, 13))
+        
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 20))
         self.menubar.setObjectName("menubar")       
@@ -105,6 +122,18 @@ class UI_MainWindow(object):
         self.ClassificationComboBox.setItemText(1, _translate("MainWindow", "Pruned Decision Tree"))
         self.ClassificationComboBox.setItemText(2, _translate("MainWindow", "Random Forest"))
         self.ClassificationLabel.setText(_translate("MainWindow", "Choose Classifier:"))
+
+        self.RecommendationComboBox.setItemText(0, _translate("MainWindow", "1"))
+        self.RecommendationComboBox.setItemText(1, _translate("MainWindow", "2"))
+        self.RecommendationComboBox.setItemText(2, _translate("MainWindow", "3"))
+        self.RecommendationComboBox.setItemText(3, _translate("MainWindow", "4"))
+        self.RecommendationComboBox.setItemText(4, _translate("MainWindow", "5"))
+        self.RecommendationComboBox.setItemText(5, _translate("MainWindow", "6"))
+        self.RecommendationComboBox.setItemText(6, _translate("MainWindow", "7"))
+        self.RecommendationComboBox.setItemText(7, _translate("MainWindow", "8"))
+        self.RecommendationComboBox.setItemText(8, _translate("MainWindow", "9"))
+        self.RecommendationComboBox.setItemText(9, _translate("MainWindow", "10"))
+        self.RecommendationLabel.setText(_translate("MainWindow", "Number of Recommendations:"))
         
         self.ClassificationPushButton.setText(_translate("MainWindow", "Get Classification"))
         self.EmbeddingPushButton.setText(_translate("MainWindow", "Embed Text"))
