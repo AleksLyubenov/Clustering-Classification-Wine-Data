@@ -8,7 +8,7 @@ from helper_functions import *
 
 class word2vec():
 
-    def __init__(self):
+    def __init__(self, settings):
         self.n = settings['n']
         self.lr = settings['learning_rate']
         self.epochs = settings['epochs']
@@ -16,37 +16,26 @@ class word2vec():
 
 
     def generate_training_data(self, settings, corpus):
-    # Find unique word counts using dictonary
         word_counts = defaultdict(int)
         for description in corpus:
             for word in description:
                 word_counts[word] += 1
 
         self.v_count = len(word_counts.keys())
-        # Generate Lookup Dictionaries (vocab)
         self.words_list = list(word_counts.keys())
-        # Generate word:index
         self.word_index = dict((word, i) for i, word in enumerate(self.words_list))
-        # Generate index:word
         self.index_word = dict((i, word) for i, word in enumerate(self.words_list))
 
         training_data = []
-
         for sentence in corpus:
             sent_len = len(sentence)
             for i, word in enumerate(sentence):
                 w_target = self.word2onehot(sentence[i])
-
+                
                 w_context = []
-
                 # Note: window_size n will have range of 2n+1 values
                 for j in range(i - self.window, i + self.window+1):
-                    # Criteria for context word
-                    # 1. Target word cannot be context word (j != i)
-                    # 2. Index must be greater or equal than 0 (j >= 0) - if not list index out of range
-                    # 3. Index must be less or equal than length of sentence (j <= sent_len-1) - if not list index out of range
                     if j != i and j <= sent_len-1 and j >= 0:
-                        # Append the one-hot representation of word to w_context
                         w_context.append(self.word2onehot(sentence[j]))
 
                 training_data.append([w_target, w_context])
@@ -56,7 +45,6 @@ class word2vec():
 
     def word2onehot(self, word):
         word_vec = np.zeros(self.v_count)
-        # Get ID of word from word_index dictionary
         word_index = self.word_index[word]
         # Change value from 0 to 1 in the corresponding location based on ID of word
         word_vec[word_index] = 1
@@ -67,16 +55,12 @@ class word2vec():
 
 
     def train(self, training_data):
-        # Initialising weight matrices
         # np.random.uniform(HIGH, LOW, OUTPUT_SHAPE)
         self.w1 = np.random.uniform(-1, 1, (self.v_count, self.n))
         self.w2 = np.random.uniform(-1, 1, (self.n, self.v_count))
 
-        # Cycle through each epoch
         for i in range(self.epochs):
-            # Intialise loss to 0
             self.loss = 0
-            # Cycle through each training sample
             # w_t = vector for target word, w_c = vectors for context words
             for w_t, w_c in training_data:
                 y_pred, h, u = self.forward_propagate(w_t.toarray().T.squeeze())
@@ -91,7 +75,7 @@ class word2vec():
 
 
     def forward_propagate(self, x):
-        # x is one-hot vector for target word
+        # Recall that x the one-hot-encoded target word
         h = np.dot(x, self.w1)
         u = np.dot(h, self.w2)
         y_c = self.softmax(u)
@@ -106,46 +90,22 @@ class word2vec():
     def back_propagate(self, e, h, x):
         dl_dw2 = np.outer(h, e)
         dl_dw1 = np.outer(x, np.dot(self.w2, e.T))
-
-        # Update weights
         self.w1 = self.w1 - (self.lr * dl_dw1)
         self.w2 = self.w2 - (self.lr * dl_dw2)
 
 
-    # Get vector from word
     def word_vec(self, word):
         w_index = self.word_index[word]
         v_w = self.w1[w_index]
         return v_w
 
 
-    # Input vector, returns nearest word(s)
-    def vec_sim(self, word, top_n):
-        v_w1 = self.word_vec(word)
-        word_sim = {}
-
-        for i in range(self.v_count):
-            # Find the similary score for each word in vocab
-            v_w2 = self.w1[i]
-            theta_sum = np.dot(v_w1, v_w2)
-            theta_den = np.linalg.norm(v_w1) * np.linalg.norm(v_w2)
-            theta = theta_sum / theta_den
-
-            word = self.index_word[i]
-            word_sim[word] = theta
-
-        words_sorted = sorted(word_sim.items(), key=lambda kv: kv[1], reverse=True)
-
-        for word, sim in words_sorted[:top_n]:
-            print(word, sim)
-
-
 def naive_w2v_embedding(df, w_size=6, v_dim=50, n_epoch=10, l_rate=0.05):
     settings = {
-        'window_size': w_size,    # context window +- center word
-        'n': v_dim,               # dimensions of word embeddings
-        'epochs': n_epoch,        # number of training epochs
-        'learning_rate': l_rate   # learning rate
+        'window_size': w_size,    
+        'n': v_dim,               
+        'epochs': n_epoch,        
+        'learning_rate': l_rate   
     }
     np.random.seed(0)               
 

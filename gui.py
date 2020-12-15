@@ -9,7 +9,7 @@ from word2vec import *
 from helper_functions import *
 from random_forest_class import *
 
-embeddedText = TRAIN = TEST = simTRAIN = simTEST = embeddingAlgorithm = classifier = None
+embeddedText = TRAIN = TEST = simTRAIN = simTEST = embeddingAlgorithm = classifier = num_neighbors = None
 
 class UI_MainWindow(object):
     
@@ -111,7 +111,7 @@ class UI_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Le Vin Parfait"))
         self.DescriptionLabel.setText(_translate("MainWindow", "Enter Wine Description Here:"))
         
         self.EmbeddingComboBox.setItemText(0, _translate("MainWindow", "Gensim Word2Vec"))
@@ -158,11 +158,11 @@ class UI_MainWindow(object):
             if embeddingAlgorithm == 'Gensim Word2Vec':
                 TRAIN, TEST, simTRAIN, simTEST = gensim_w2v_embedding(df)
             else:
-                #TRAIN, TEST, simTRAIN, simTEST  = naive_w2v_embedding(df)
-                TRAIN = load_obj('TRAIN')
-                TEST = load_obj('TEST')
-                simTRAIN = load_obj('simTRAIN')
-                simTEST = load_obj('simTEST')
+                #TRAIN, TEST, simTRAIN, simTEST  = naive_w2v_embedding(df) 
+                TRAIN = load_obj('TRAINC')
+                TEST = load_obj('TESTC')
+                simTRAIN = load_obj('simTRAINC')
+                simTEST = load_obj('simTESTC')
             print('TEST VECTOR:\n{}\n'.format(TEST))    
             
             embeddedText = TEST.loc[TEST['target_label']=='X'].iloc[0, 0:-1]
@@ -194,27 +194,32 @@ class UI_MainWindow(object):
             classifier = str(self.ClassificationComboBox.currentText())
             if classifier == 'Decision Tree':
                 if embeddingAlgorithm == 'Gensim Word2Vec':
-                    clf = load_obj('DECISION_TREE_FULL_TRAIN_GENSIM')
+                    clf = load_obj('DECISION_TREE_FINAL_GENSIM')
+                    print('Decision Tree with Gensim Embedding')
                 else:
-                    clf = load_obj('DECISION_TREE_FULL_TRAIN_NAIVE')        
+                    clf = load_obj('DECISION_TREE_FINAL_NAIVE')
+                    print('Decision Tree with Naive Embedding')
                 prediction=clf.predict_example(TEST, clf.tree)
             
             elif classifier == 'Pruned Decision Tree':
                 if embeddingAlgorithm == 'Gensim Word2Vec':
-                    clf = load_obj('PRUNED_DECISION_TREE_FULL_TRAIN_GENSIM')
+                    clf = load_obj('PRUNED_DECISION_TREE_FINAL_GENSIM')
+                    print('Pruned Decision Tree with Gensim Embedding')
                 else:
-                    clf = load_obj('PRUNED_DECISION_TREE_FULL_TRAIN_NAIVE') 
+                    clf = load_obj('PRUNED_DECISION_TREE_FINAL_NAIVE')
+                    print('Pruned Decision Tree with Naive Embedding')                    
                 prediction=clf.predict_example(TEST, clf.tree)
                 
             else:
                 if embeddingAlgorithm == 'Gensim Word2Vec':
-                    clf = load_obj('RANDOM_FOREST_FULL_TRAIN_GENSIM')
+                    clf = load_obj('RANDOM_FOREST_FINAL_GENSIM')
+                    print('Random Forest with Gensim Embedding')
                 else:
-                    clf = load_obj('RANDOM_FOREST_FULL_TRAIN_NAIVE')     
+                    clf = load_obj('RANDOM_FOREST_FINAL_NAIVE') 
+                    print('Random Forest with Naive Embedding')
                 prediction = clf.random_forest_predict(TEST)
                 prediction = prediction.values[0]
 
-            print('Used {} with {} embeddings.'.format(classifier,embeddingAlgorithm))
             if prediction == 0.0:
                 msgBox.setText('The wine you are describing is: ' + 'WHITE')
             else:
@@ -231,7 +236,7 @@ class UI_MainWindow(object):
             print('Cancel clicked')
             
     def on_click_recommendation(self):
-        global embeddedText, TRAIN, TEST, simTRAIN, simTEST, embeddingAlgorithm, classifier
+        global embeddedText, TRAIN, TEST, simTRAIN, simTEST, embeddingAlgorithm, classifier, num_neighbors
 
         msgBox = QtWidgets.QMessageBox()
         
@@ -240,12 +245,13 @@ class UI_MainWindow(object):
             msgBox.setWindowTitle('RecommendationError')
             msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
         else:
-            similar_wines = similar_descriptions(simTRAIN, simTEST, 5)
+            num_neighbors = str(self.RecommendationComboBox.currentText())
+            similar_wines = similar_descriptions(simTRAIN, simTEST, int(num_neighbors))
             
             str_main = ""
             for i in range(len(similar_wines)):
-                str = '\nWine No. {} - {}'.format(i+1, similar_wines[i][0])
-                str_main += str
+                str1 = '\nWine No. {} - {}'.format(i+1, similar_wines[i][0])
+                str_main += str1
             msgBox.setText(str_main)
                 
             msgBox.setWindowTitle('Recommendations')

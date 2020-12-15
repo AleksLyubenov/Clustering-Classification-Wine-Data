@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
+from helper_functions import *
 
 class decision_tree:
     
@@ -238,9 +239,10 @@ class decision_tree:
         return predictions
 
 
-    def calculate_accuracy(self, df):
-        predictions = self.make_predictions(df)
+    def calculate_accuracy(self, df, tree):
+        predictions = self.make_predictions(df, tree)
         predictions_correct = predictions == df.target_label
         accuracy = predictions_correct.mean()
+        conf_matrix([predictions], [df.target_label])
         
         return accuracy

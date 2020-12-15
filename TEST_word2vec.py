@@ -7,7 +7,7 @@ if __name__ == "__main__":
     settings = {
         'window_size': 6,       # context window +- center word
         'n': 50,                # dimensions of word embeddings
-        'epochs': 10,           # number of training epochs
+        'epochs': 33,           # number of training epochs
         'learning_rate': 0.05   # learning rate
     }
     np.random.seed(0)               
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     corpus = df['description']
     # Initialise object
-    w2v = word2vec()
+    w2v = word2vec(settings)
     # Numpy ndarray with one-hot representation for [target_word, context_words]
     training_data = w2v.generate_training_data(settings, corpus)
     # Training
@@ -57,9 +57,9 @@ if __name__ == "__main__":
     print('TRAIN:\n{}\n'.format(TRAIN))
     print('TEST:\n{}\n'.format(TEST))
 
-    save_obj(TRAIN, 'TRAIN')
-    save_obj(TEST, 'TEST')
-    save_obj(train_df, 'simTRAIN')
-    save_obj(test_df, 'simTEST')
-    save_obj(w2v, 'trained_w2v_model')
+    save_obj(TRAIN, 'TRAINC')
+    save_obj(TEST, 'TESTC')
+    save_obj(train_df, 'simTRAINC')
+    save_obj(test_df, 'simTESTC')
+    save_obj(w2v, 'trained_w2v_modelC')
 

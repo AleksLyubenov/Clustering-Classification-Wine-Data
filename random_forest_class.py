@@ -76,7 +76,7 @@ class random_forest:
         predictions = self.random_forest_predict(df)
         predictions_correct = predictions == df.target_label
         accuracy = predictions_correct.mean()    
-
+        '''
         if(ml_task == 'classification'):
             precision, recall, fscore, support = score(df['target_label'], predictions, average='weighted')
             print('precision: \t {}'.format(precision))
@@ -88,7 +88,7 @@ class random_forest:
             mse = mean_squared_error(df['target_label'], predictions)
             print('R2 Score: \t {}'.format(r2))
             print('Mean Squared Error: \t {}'.format(mse))
-            
+        ''' 
         return accuracy, predictions
         
         

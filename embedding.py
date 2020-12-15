@@ -110,7 +110,7 @@ def similar_descriptions(simTRAIN, simTEST, n_neighbours=5):
         
     for i in range(len(simTRAIN)-1):
         v1 = np.asarray(simTRAIN.iloc[i]['description'])
-        similarity_score = (np.linalg.norm(v1) * np.linalg.norm(v2)) / np.dot(v1, v2)
+        similarity_score = (np.linalg.norm(v1) * np.linalg.norm(v2))/np.dot(v1, v2)
         
         idx = simTRAIN.loc[simTRAIN['description'].isin([v1])].index.values[0]
         desc_sim[idx] = similarity_score     

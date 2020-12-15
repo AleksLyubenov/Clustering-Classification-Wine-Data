@@ -5,6 +5,8 @@ import random
 from random import randrange
 import pickle 
 
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 #Save and load objects from file
 def save_obj(obj, name):
@@ -72,3 +74,43 @@ def random_exclude(excluded, range_list):
         return random_exclude(excluded, range_list)
     else:
         return number  
+        
+        
+def to_integer(arr):
+    arr_2 = []
+    for i in range(len(arr)):
+        arr_2.append(int(arr[i][1]))
+    return np.asarray(arr_2)
+
+
+# Visualize performance by Normalized confusion matrix
+def conf_matrix(predicted_labels, test_labels):
+    predicted_labels = to_integer(predicted_labels)
+    test_labels = to_integer(test_labels)
+    
+    numClasses = 2
+    conf = np.zeros([numClasses,numClasses])
+
+    for i in range(len(test_labels)):
+        real = test_labels[i]
+        guess = predicted_labels[i]
+        conf[real, guess] += 1
+    
+    rowsums = np.sum(conf,1)
+    rowsums = np.reshape(rowsums,[numClasses,1])
+    rowsums = np.repeat(rowsums,numClasses, axis = 1)
+    conf = conf / rowsums
+    
+    
+    df_cm = pd.DataFrame(conf, index = [i for i in range(0, 2)], 
+                         columns = [i for i in range(0, 2)])
+    plt.figure(figsize=(9,6))
+    sns.set(rc={'axes.edgecolor':'black', 'axes.facecolor':'w','figure.facecolor':'w'})    
+    sns.heatmap(df_cm, cmap="Blues",annot=True)
+
+    # Adjust heatmap to compensate for the cut off edges
+    b, t = plt.ylim() # Find the values for bottom and top
+    b += 0.5 # Add 0.5 to the bottom
+    t -= 0.5 # Subtract 0.5 from the top
+    plt.ylim(b, t) # update the ylim(bottom, top) values
+    plt.show()
